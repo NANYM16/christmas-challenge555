@@ -411,11 +411,91 @@ zone.innerHTML+=`
 
 }
 
+  <div class="popup" id="adminPanel">
+
+<div class="popup-content" style="width:700px;max-width:95%;">
+
+<h2>⚙️ Administration</h2>
+
+<br>
+
+<h3>Créer une équipe</h3>
+
+<input
+type="text"
+id="newTeamName"
+placeholder="Nom équipe">
+
+<input
+type="text"
+id="newCaptain"
+placeholder="Capitaine">
+
+<br><br>
+
+<button onclick="addTeam()">
+Créer équipe
+</button>
+
+<hr><br>
+
+<h3>Ajouter un vendeur</h3>
+
+<input
+type="text"
+id="playerName"
+placeholder="Nom vendeur">
+
+<select id="teamSelect">
+</select>
+
+<br><br>
+
+<button onclick="addPlayer()">
+Ajouter vendeur
+</button>
+
+<hr><br>
+
+<h3>Points rapides</h3>
+
+<select id="pointsPlayer">
+</select>
+
+<input
+type="number"
+id="pointsValue"
+value="10">
+
+<button onclick="addCustomPoints()">
+Ajouter points
+</button>
+
+<hr><br>
+
+<button onclick="closeAdmin()">
+Fermer
+</button>
+
+</div>
+
+</div>
+  
 function openAdmin(){
 
-alert(
-"Mode Admin V5 à venir dans la Partie 2"
-);
+const password =
+prompt("Mot de passe Admin");
+
+if(password !== "123456"){
+
+alert("Accès refusé");
+return;
+
+}
+
+document
+.getElementById("adminPanel")
+.style.display="flex";
 
 }
 
