@@ -1,1 +1,442 @@
-<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Winter Challenge V3 - Dashboard & Equipes</title><style>body{margin:0;font-family:Segoe UI,Arial;background:#f6f2ea;color:#222}header{background:linear-gradient(135deg,#c8102e,#1f7a45);color:#fff;padding:24px;text-align:center}nav{display:flex;gap:10px;justify-content:center;margin-top:10px}nav button{padding:10px 16px;border:none;border-radius:10px}section{padding:20px}.hidden{display:none}.grid{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}.card{background:#fff;border-radius:18px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.1)}.team{padding:10px;margin:8px 0;border-radius:10px}.r{background:#ffe3e3}.g{background:#e3f6e8}.b{background:#e5edff}input,select{padding:8px;margin:4px;width:100%}button.action{background:#c8102e;color:#fff;border:none;padding:8px 12px;border-radius:8px;margin:2px}.members li{margin:4px 0}</style></head><body><header><h1>🎄 Winter Challenge 2026</h1><div id="subtitle"></div><nav><button onclick="showPage('dashboard')">Dashboard</button><button onclick="showPage('teams')">Équipes</button></nav></header><section id="dashboard"><div class="grid"><div class="card"><h2>🏆 Classement Équipes</h2><div class="team r"><span id="t1n"></span> : <b id="t1s">0</b> pts</div><div class="team g"><span id="t2n"></span> : <b id="t2s">0</b> pts</div><div class="team b"><span id="t3n"></span> : <b id="t3s">0</b> pts</div></div><div class="card"><h2>⚙️ Attribution points</h2><select id="teamSelect"></select><button class="action" onclick="addPts(1)">+1 Member</button><button class="action" onclick="addPts(10)">+10 Nike.com</button><button class="action" onclick="addPts(20)">+20 Bonus</button><p id="msg"></p></div></div></section><section id="teams" class="hidden"><div class="card"><h2>👥 Gestion des équipes</h2><h3>Nom des équipes</h3><input id="n1"><input id="n2"><input id="n3"><button class="action" onclick="saveTeams()">Enregistrer</button><hr><h3>Membres</h3><select id="memberTeam"></select><input id="memberName" placeholder="Nom collaborateur"><button class="action" onclick="addMember()">Ajouter</button><div id="lists"></div></div></section><script>let teams=JSON.parse(localStorage.getItem('wc_teams'))||['Team Lola','Team Yasmine','Team Elisa'];let scores=JSON.parse(localStorage.getItem('wc_scores'))||[0,0,0];let members=JSON.parse(localStorage.getItem('wc_members'))||[[],[],[]];function showPage(id){dashboard.classList.add('hidden');teams.classList.add('hidden');document.getElementById(id).classList.remove('hidden')}function render(){subtitle.innerText=teams.join(' • ');n1.value=teams[0];n2.value=teams[1];n3.value=teams[2];t1n.innerText=teams[0];t2n.innerText=teams[1];t3n.innerText=teams[2];t1s.innerText=scores[0];t2s.innerText=scores[1];t3s.innerText=scores[2];teamSelect.innerHTML='';memberTeam.innerHTML='';teams.forEach((t,i)=>{teamSelect.innerHTML+=`<option value="${i}">${t}</option>`;memberTeam.innerHTML+=`<option value="${i}">${t}</option>`});let html='';teams.forEach((t,i)=>{html+=`<div class="team"><h4>${t} (${members[i].length})</h4><ul class="members">`;members[i].forEach((m,j)=>html+=`<li>${m} <button onclick="removeMember(${i},${j})">❌</button></li>`);html+='</ul></div>';});lists.innerHTML=html;}function saveTeams(){teams=[n1.value,n2.value,n3.value];localStorage.setItem('wc_teams',JSON.stringify(teams));render()}function addPts(p){let i=parseInt(teamSelect.value);scores[i]+=p;localStorage.setItem('wc_scores',JSON.stringify(scores));msg.innerText='✅ +'+p+' pts pour '+teams[i];render()}function addMember(){let i=parseInt(memberTeam.value);let n=memberName.value.trim();if(!n)return;members[i].push(n);memberName.value='';localStorage.setItem('wc_members',JSON.stringify(members));render()}function removeMember(i,j){members[i].splice(j,1);localStorage.setItem('wc_members',JSON.stringify(members));render()}render();</script></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>NIKE Winter Challenge 2026</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:
+linear-gradient(180deg,#9d0000,#cc0000);
+color:white;
+min-height:100vh;
+}
+
+header{
+padding:20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:#7b0000;
+box-shadow:0 0 15px rgba(0,0,0,.3);
+}
+
+.logo{
+font-size:32px;
+font-weight:bold;
+}
+
+.store{
+font-size:18px;
+opacity:.9;
+}
+
+.container{
+padding:20px;
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:20px;
+}
+
+.card{
+background:white;
+color:black;
+border-radius:15px;
+padding:20px;
+box-shadow:0 0 10px rgba(0,0,0,.2);
+}
+
+.card h2{
+margin-bottom:15px;
+}
+
+.calendar{
+display:grid;
+grid-template-columns:repeat(6,1fr);
+gap:10px;
+}
+
+.day{
+height:80px;
+border-radius:12px;
+background:#f4f4f4;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+font-weight:bold;
+transition:.3s;
+}
+
+.day:hover{
+transform:scale(1.05);
+background:#d10000;
+color:white;
+}
+
+.team{
+display:flex;
+justify-content:space-between;
+padding:10px;
+margin-bottom:10px;
+background:#f0f0f0;
+border-radius:10px;
+}
+
+.rank{
+font-size:20px;
+font-weight:bold;
+}
+
+.popup{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.7);
+display:none;
+align-items:center;
+justify-content:center;
+}
+
+.popup-content{
+background:white;
+color:black;
+padding:30px;
+border-radius:20px;
+width:400px;
+max-width:90%;
+}
+
+button{
+background:#d10000;
+color:white;
+border:none;
+padding:10px 20px;
+border-radius:10px;
+cursor:pointer;
+}
+
+button:hover{
+background:#900;
+}
+
+@media(max-width:900px){
+
+.container{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div>
+
+<div class="logo">
+🏆 WINTER CHALLENGE 2026
+</div>
+
+<div class="store">
+NIKE TALANGE 555
+</div>
+
+</div>
+
+<button onclick="openAdmin()">
+Admin
+</button>
+
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h2>🎄 Calendrier de l'avant</h2>
+
+<div class="calendar" id="calendar">
+
+</div>
+
+</div>
+
+<div>
+
+<div class="card">
+
+<h2>🥇 Classement Equipes</h2>
+
+<div id="teams"></div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+<h2>🏅 Top vendeurs</h2>
+
+<div id="players"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="popup" id="popup">
+
+<div class="popup-content">
+
+<h2 id="popupTitle"></h2>
+
+<p id="popupMission"></p>
+
+<br>
+
+<button onclick="closePopup()">
+Fermer
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const APP = {
+
+teams:[
+{
+name:"Team Lola",
+captain:"Lola",
+score:0
+},
+{
+name:"Team Yasmine",
+captain:"Yasmine",
+score:0
+},
+{
+name:"Team Elisa",
+captain:"Elisa",
+score:0
+}
+],
+
+players:[
+
+{name:"Lucas",team:"Team Lola",points:0},
+
+{name:"Jade",team:"Team Yasmine",points:0},
+
+{name:"Paul",team:"Team Elisa",points:0}
+
+],
+
+missions:[
+
+"Commande Nike.com x2",
+"UPT 3 obligatoire",
+"Membership 20%",
+"Mission Surprise",
+"Plus grosse commande",
+"30 memberships",
+"Commande +150€",
+
+"Mission 8",
+"Mission 9",
+"Mission 10",
+"Mission 11",
+"Mission 12",
+"Mission 13",
+"Mission 14",
+"Mission 15",
+"Mission 16",
+"Mission 17",
+"Mission 18",
+"Mission 19",
+"Mission 20",
+"Mission 21",
+"Mission 22",
+"Mission 23",
+"Mission 24"
+
+]
+
+};
+
+function save(){
+
+localStorage.setItem(
+"winterChallenge2026",
+JSON.stringify(APP)
+);
+
+}
+
+function load(){
+
+let saved =
+localStorage.getItem(
+"winterChallenge2026"
+);
+
+if(saved){
+
+Object.assign(
+APP,
+JSON.parse(saved)
+);
+
+}
+
+}
+
+function buildCalendar(){
+
+const calendar =
+document.getElementById("calendar");
+
+calendar.innerHTML="";
+
+APP.missions.forEach((mission,index)=>{
+
+const day =
+document.createElement("div");
+
+day.className="day";
+
+day.innerHTML=
+(index+1);
+
+day.onclick=()=>{
+
+document.getElementById(
+"popupTitle"
+).innerText=
+"Jour "+(index+1);
+
+document.getElementById(
+"popupMission"
+).innerText=
+mission;
+
+document.getElementById(
+"popup"
+).style.display=
+"flex";
+
+};
+
+calendar.appendChild(day);
+
+});
+
+}
+
+function renderTeams(){
+
+const zone =
+document.getElementById("teams");
+
+zone.innerHTML="";
+
+APP.teams
+.sort((a,b)=>b.score-a.score)
+.forEach((team,index)=>{
+
+zone.innerHTML+=`
+
+<div class="team">
+
+<div>
+
+${index+1}. ${team.name}
+
+</div>
+
+<div>
+
+${team.score} pts
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+function renderPlayers(){
+
+const zone =
+document.getElementById("players");
+
+zone.innerHTML="";
+
+APP.players
+.sort((a,b)=>b.points-a.points)
+.forEach(player=>{
+
+zone.innerHTML+=`
+
+<div class="team">
+
+<div>${player.name}</div>
+
+<div>${player.points} pts</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+function openAdmin(){
+
+alert(
+"Mode Admin V5 à venir dans la Partie 2"
+);
+
+}
+
+function closePopup(){
+
+document.getElementById(
+"popup"
+).style.display=
+"none";
+
+}
+
+load();
+
+buildCalendar();
+
+renderTeams();
+
+renderPlayers();
+
+</script>
+
+</body>
+</html>
